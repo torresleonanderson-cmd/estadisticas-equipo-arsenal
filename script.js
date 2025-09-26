@@ -204,17 +204,20 @@ function pausarTimer() { clearInterval(timerInterval); timerInterval = null; }
 function resetTimer(resetearEtapa = true) { pausarTimer(); segundosRestantes = 40 * 60; if (resetearEtapa) { etapaActual = 1; } actualizarDisplayTimer(); }
 function actualizarDisplayTimer() { const m = Math.floor(segundosRestantes / 60); const s = segundosRestantes % 60; document.getElementById('cronometro').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; document.getElementById('etapa-tiempo').textContent = etapaActual === 1 ? '1er Tiempo' : '2do Tiempo'; }
 function reproducirSilbato() { document.getElementById('sonido-silbato').play(); }
-function abrirModal(id) { document.getElementById(id).classList.remove('modal-oculta'); }
-function cerrarModal(id) { document.getElementById(id).classList.add('modal-oculta'); }
+function abrirModal(id) { document.getElementById(id).classList.remove('modal-oculto'); }
+function cerrarModal(id) { document.getElementById(id).classList.add('modal-oculto'); }
 function mostrarAlerta(titulo, mensaje) { document.getElementById('alerta-titulo').textContent = titulo; document.getElementById('alerta-mensaje').textContent = mensaje; abrirModal('modal-alerta'); }
 function abrirModalConfirmacion(index, nombre) { indiceJugadorAEliminar = index; document.getElementById('nombre-jugador-modal').textContent = nombre; abrirModal('modal-confirmacion'); }
 function actualizarEstadistica(index, tipo, accion) { const j = jugadoresConvocados[index]; if (accion === 'sumar') j.statsPartido[tipo]++; else if (accion === 'restar' && j.statsPartido[tipo] > 0) j.statsPartido[tipo]--; actualizarVista(); }
 function actualizarProximoPartido() { const f = document.getElementById('input-fecha'), r = document.getElementById('input-rival'); if (f.value && r.value.trim()) { proximoPartido.fecha = new Date(f.value + 'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); proximoPartido.rival = r.value.trim(); f.value = ''; r.value = ''; localStorage.setItem('proximoPartido', JSON.stringify(proximoPartido)); actualizarVista(); } else { mostrarAlerta('Datos incompletos', 'Por favor, completa la fecha y el nombre del rival.'); } }
 
 // --- FUNCIÓN DE RESETEO ---
+// 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN! Esta función ahora abre el modal de confirmación. 👇
 function abrirModalReset() {
     abrirModal('modal-reset');
 }
+
+// Esta es la función que se llama DESPUÉS de confirmar en el modal
 async function confirmarResetTotal() {
     cerrarModal('modal-reset');
     mostrarAlerta('Procesando...', 'Reiniciando todas las estadísticas. Por favor, espera.');
