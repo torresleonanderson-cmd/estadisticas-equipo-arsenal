@@ -31,7 +31,7 @@ input:checked + .slider:before { transform: translateX(24px); }
 
 /* --- DASHBOARD Y GRÁFICO --- */
 .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
-.chart-container { position: relative; height: 350px; width: 100%; } /* <-- ESTA ES LA SOLUCIÓN */
+.chart-container { position: relative; height: 350px; width: 100%; }
 .leaderboard-container { min-height: 350px; }
 
 /* --- MARCADOR Y EVENTOS --- */
@@ -56,9 +56,9 @@ input, select { padding: 12px; border: 1px solid var(--color-borde); background-
 .btn-reset { background-color: var(--color-derrota); }
 .finalizar-btn, .btn-aceptar { background-color: var(--color-victoria); }
 .btn-eliminar { background-color: var(--color-derrota); padding: 8px; line-height: 1; }
-.stat-controls { display: flex; justify-content: center; align-items: center; gap: 8px; }
-.stat-value { min-width: 20px; font-weight: bold; font-size: 1.2em; }
-.stat-btn { background-color: var(--color-fondo); color: var(--color-texto-principal); border: 1px solid var(--color-borde); width: 28px; height: 28px; border-radius: 50%; padding: 0; line-height: 26px; font-size: 1rem; font-weight: bold; }
+.stat-controls { display: flex; justify-content: center; align-items: center; gap: 5px; } /* Reducido el gap */
+.stat-value { min-width: 15px; font-weight: bold; font-size: 1.1em; }
+.stat-btn { background-color: var(--color-fondo); color: var(--color-texto-principal); border: 1px solid var(--color-borde); width: 24px; height: 24px; border-radius: 50%; padding: 0; line-height: 22px; font-size: 0.9rem; font-weight: bold; }
 
 /* --- RESTO DE ESTILOS --- */
 .marcadores { display: flex; justify-content: space-around; gap: 10px; }
@@ -96,4 +96,27 @@ input, select { padding: 12px; border: 1px solid var(--color-borde); background-
     .chart-container { min-height: 300px; height: 40vh; }
     .eventos-container { grid-template-columns: 1fr; }
     input, select, button { width: 100%; margin: 5px 0; box-sizing: border-box; }
+}
+
+/* --- ESTILOS RESPONSIVE PARA TABLAS --- */
+.tabla-responsive-container {
+    overflow-x: auto; /* ¡La línea mágica que crea el scroll horizontal! */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
+    padding-bottom: 5px;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+/* Forzamos un ancho mínimo para que el scroll siempre funcione si es necesario */
+#tabla-jugadores, #tabla-lideres, #tabla-historial {
+    min-width: 650px; /* Ajusta este valor si ves que todavía se deforma */
+}
+
+/* Reducimos el espacio y evitamos que el texto se rompa en las celdas */
+#tabla-jugadores th, #tabla-jugadores td,
+#tabla-lideres th, #tabla-lideres td,
+#tabla-historial th, #tabla-historial td {
+    padding: 12px 8px; /* Menos espacio a los lados */
+    white-space: nowrap; /* Evita que el texto se parta en varias líneas */
 }
