@@ -1,0 +1,99 @@
+/* --- VARIABLES DE COLOR --- */
+:root { --color-fondo: #f0f2f5; --color-superficie: white; --color-texto-principal: #333; --color-texto-secundario: #666; --color-borde: #ddd; --color-arsenal-azul: #023474; --color-arsenal-rojo: #db0007; --color-victoria: #28a745; --color-empate: #6c757d; --color-derrota: #dc3545; --color-amarillo: #ffc107; --color-amarillo-tarjeta: #ffd900; }
+.dark-mode { --color-fondo: #121212; --color-superficie: #1e1e1e; --color-texto-principal: #e0e0e0; --color-texto-secundario: #a0a0a0; --color-borde: #444; }
+
+/* --- ESTILOS GENERALES Y LAYOUT --- */
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--color-fondo); color: var(--color-texto-principal); margin: 0; padding: 10px 20px; transition: background-color 0.3s, color 0.3s; }
+main { max-width: 900px; margin: auto; }
+section { background-color: var(--color-superficie); border: 1px solid var(--color-borde); margin-bottom: 20px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: background-color 0.3s, border 0.3s; }
+h1, h2, h3 { color: var(--color-arsenal-azul); }
+h2 { border-bottom: 2px solid var(--color-fondo); padding-bottom: 10px; }
+.yellow { color: var(--color-amarillo-tarjeta); }
+.red { color: var(--color-derrota); }
+
+/* --- HEADER Y MODO OSCURO --- */
+header { background-color: var(--color-arsenal-rojo); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; position: relative; }
+header h1 { margin: 0; font-size: clamp(1.5rem, 4vw, 2.2rem); display: flex; justify-content: center; align-items: center; gap: 15px; }
+header h1 img { height: 45px; }
+.theme-switch-wrapper { display: flex; align-items: center; position: absolute; top: 15px; right: 20px; font-size: 0.8rem; }
+.theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; margin-right: 10px; }
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--color-arsenal-azul); }
+input:checked + .slider:before { transform: translateX(24px); }
+
+/* --- NAVEGACIÓN DE VISTAS --- */
+.vista-navegacion { display: flex; gap: 10px; margin-bottom: 20px; }
+.vista-navegacion button { flex: 1; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.3s; background-color: var(--color-superficie); color: var(--color-arsenal-azul); border: 2px solid var(--color-arsenal-azul); }
+.vista-navegacion button.active { background-color: var(--color-arsenal-azul); color: white; border-color: var(--color-arsenal-azul); }
+.vista-oculta { display: none; }
+
+/* --- DASHBOARD Y GRÁFICO --- */
+.dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
+.chart-container { position: relative; min-height: 350px; width: 100%; }
+.leaderboard-container { min-height: 350px; }
+
+/* --- MARCADOR Y EVENTOS --- */
+.marcador-partido { text-align: center; }
+.marcador-display h1 { font-size: clamp(3rem, 10vw, 4.5rem); color: var(--color-arsenal-azul); margin: 10px 0; }
+.eventos-container { margin-top: 15px; color: var(--color-texto-secundario); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+.eventos-partido p { margin: 0; }
+
+/* --- BOTONES Y FORMULARIOS --- */
+button { background-color: var(--color-arsenal-azul); color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s, background-color 0.2s; }
+button:hover { opacity: 0.85; }
+input, select { padding: 12px; border: 1px solid var(--color-borde); background-color: var(--color-fondo); color: var(--color-texto-principal); border-radius: 8px; width: auto; flex-grow: 1; }
+.form-partido, .finalizar-partido-form, .form-jugador, .form-crear-jugador { margin-top: 10px; display: flex; align-items: center; gap: 10px; }
+.form-jugador select, .form-crear-jugador input, .form-crear-jugador select { flex-grow: 2; }
+.form-jugador button, .form-crear-jugador button { flex-grow: 1; }
+.gestion-plantilla { border-top: 2px dashed var(--color-borde); padding-top: 20px; }
+.finalizar-partido-form input[type="number"] { max-width: 100px; text-align: center; font-size: 1.2em; flex-grow: 0; }
+.tiempo-controles { display: flex; justify-content: center; gap: 10px; }
+.tiempo-controles button { width: 50px; height: 50px; padding: 0; border-radius: 50%; line-height: 50px; font-size: 1.2em; }
+.btn-start { background-color: var(--color-victoria); }
+.btn-pause { background-color: var(--color-amarillo); color: var(--color-texto-principal); }
+.btn-reset { background-color: var(--color-derrota); }
+.finalizar-btn, .btn-aceptar { background-color: var(--color-victoria); }
+.btn-eliminar { background-color: var(--color-derrota); padding: 8px; line-height: 1; }
+.stat-controls { display: flex; justify-content: center; align-items: center; gap: 8px; }
+.stat-value { min-width: 20px; font-weight: bold; font-size: 1.2em; }
+.stat-btn { background-color: var(--color-fondo); color: var(--color-texto-principal); border: 1px solid var(--color-borde); width: 28px; height: 28px; border-radius: 50%; padding: 0; line-height: 26px; font-size: 1rem; font-weight: bold; }
+
+/* --- RESTO DE ESTILOS --- */
+.marcadores { display: flex; justify-content: space-around; gap: 10px; }
+.marcador-card { flex: 1; text-align: center; }
+.marcador-card p { font-size: 2.5em; font-weight: bold; color: var(--color-arsenal-rojo); margin-top: 10px; }
+.tiempo-partido { text-align: center; }
+.cronometro-display { font-size: 3.5em; font-weight: bold; color: var(--color-arsenal-azul); margin: 10px 0; }
+#tabla-jugadores, #tabla-historial, #tabla-lideres { width: 100%; border-collapse: collapse; margin-top: 20px; }
+#tabla-jugadores th, #tabla-historial th, #tabla-lideres th { background-color: var(--color-fondo); }
+#tabla-jugadores th, td, #tabla-historial th, td, #tabla-lideres th, td { border: 1px solid var(--color-borde); padding: 10px; text-align: center; vertical-align: middle; }
+.clickable-row { cursor: pointer; transition: background-color 0.2s; }
+.clickable-row:hover { background-color: var(--color-fondo); }
+.zona-peligro { border: 2px solid var(--color-derrota); background-color: rgba(220, 53, 69, 0.1); }
+.btn-reset-total { background-color: var(--color-derrota); width: 100%; padding: 15px; font-size: 1.1em; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; animation: fadeIn 0.3s; }
+.modal-overlay:not(.modal-oculto) { opacity: 1; visibility: visible; }
+.modal-contenido { background-color: var(--color-superficie); padding: 20px 30px; border-radius: 12px; text-align: center; width: 90%; max-width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.modal-acciones { margin-top: 20px; display: flex; justify-content: space-around; gap: 10px; }
+.btn-cancelar { background-color: var(--color-empate); }
+.btn-confirmar-eliminar { background-color: var(--color-derrota); }
+#contenido-fin-partido { color: white; } #contenido-fin-partido h2, #contenido-fin-partido h3, #contenido-fin-partido h1 { color: white; }
+.resultado-historial { font-weight: bold; padding: 4px 8px; border-radius: 4px; color: white; }
+.resultado-historial.victoria, .modal-victoria { background-color: var(--color-victoria); }
+.resultado-historial.empate, .modal-empate { background-color: var(--color-empate); }
+.resultado-historial.derrota, .modal-derrota { background-color: var(--color-derrota); }
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    header h1 { font-size: 1.3rem; }
+    .theme-switch-wrapper { display: none; }
+    .vista-navegacion, .dashboard, .marcadores, .form-partido, .finalizar-partido-form, .form-jugador, .form-crear-jugador { flex-direction: column; }
+    .dashboard { grid-template-columns: 1fr; }
+    .chart-container { min-height: 300px; height: 40vh; }
+    .eventos-container { grid-template-columns: 1fr; }
+    input, select, button { width: 100%; margin: 5px 0; box-sizing: border-box; }
+}

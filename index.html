@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas Arsenal FC</title>
+    
+    <link rel="icon" type="image/jpeg" href="imagenes/EscudoArsenal.jpg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Estadísticas del Equipo - Arsenal FC <img src="imagenes/EscudoArsenal.jpg" alt="Escudo del Equipo"></h1>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox"><input type="checkbox" id="checkbox" onchange="toggleDarkMode()" /><div class="slider round"></div></label>
+            <span id="theme-label">Modo Oscuro</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- ======== NAVEGACIÓN ENTRE VISTAS ======== -->
+        <nav class="vista-navegacion">
+            <button id="btn-vista-partido" class="active" onclick="cambiarVista('vista-partido')"><i class="fa-solid fa-futbol"></i> Partido en Vivo</button>
+            <button id="btn-vista-estadisticas" onclick="cambiarVista('vista-estadisticas')"><i class="fa-solid fa-chart-line"></i> Estadísticas Generales</button>
+        </nav>
+
+        <!-- ======== VISTA 1: PARTIDO EN VIVO (POR DEFECTO) ======== -->
+        <div id="vista-partido">
+            <section class="proximo-partido">
+                <h2><i class="fa-solid fa-calendar-days"></i> Próximo Partido</h2>
+                <div id="info-proximo-partido"><p><strong>Fecha:</strong> <span id="fecha-proximo">A definir</span></p><p><strong>Contra:</strong> <span id="rival-proximo">A definir</span></p></div>
+                <div class="form-partido"><input type="date" id="input-fecha"><input type="text" id="input-rival" placeholder="Nombre del rival"><button onclick="actualizarProximoPartido()">Programar</button></div>
+            </section>
+
+            <section class="tiempo-partido">
+                <h2><i class="fa-solid fa-hourglass-half"></i> Tiempo de Juego (<span id="etapa-tiempo">1er Tiempo</span>)</h2>
+                <div id="cronometro" class="cronometro-display">40:00</div>
+                <div class="tiempo-controles"><button class="btn-start" onclick="iniciarTimer()"><i class="fa-solid fa-play"></i></button><button class="btn-pause" onclick="pausarTimer()"><i class="fa-solid fa-pause"></i></button><button class="btn-reset" onclick="resetTimer(true)"><i class="fa-solid fa-undo"></i></button></div>
+            </section>
+
+            <section class="marcador-partido">
+                <h2><i class="fa-solid fa-stopwatch"></i> Marcador del Partido</h2>
+                <div class="marcador-display"><h1><span id="nuestros-goles">0</span> - <span id="rival-goles-display">0</span></h1><p class="equipos-display">Arsenal FC vs <strong id="rival-actual">Rival</strong></p></div>
+                <div class="eventos-container">
+                    <div id="lista-goles" class="eventos-partido"></div>
+                    <div id="lista-asistencias" class="eventos-partido"></div>
+                    <div id="lista-amarillas" class="eventos-partido"></div>
+                    <div id="lista-rojas" class="eventos-partido"></div>
+                </div>
+            </section>
+
+            <section class="jugadores">
+                <h2><i class="fa-solid fa-clipboard-user"></i> Jugadores Convocados</h2>
+                <table id="tabla-jugadores">
+                    <thead><tr><th>Pos.</th><th>Nombre</th><th>Goles <i class="fa-solid fa-futbol"></i></th><th>Asist. <i class="fa-solid fa-hands-helping"></i></th><th>Amarillas <i class="fa-solid fa-square-full yellow"></i></th><th>Rojas <i class="fa-solid fa-square-full red"></i></th><th>Acciones</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div class="form-jugador-container">
+                    <div class="form-jugador">
+                        <label for="jugador-select">Convocar desde la plantilla:</label>
+                        <select id="jugador-select"></select>
+                        <button onclick="convocarJugador()">Convocar</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="gestion-plantilla">
+                <h2><i class="fa-solid fa-user-plus"></i> Gestionar Plantilla (Base de Datos)</h2>
+                <div class="form-crear-jugador">
+                    <input type="text" id="nuevo-jugador-nombre" placeholder="Nombre del nuevo jugador" required>
+                    <select id="nuevo-jugador-posicion">
+                        <option value="POR">Portero</option><option value="DEF">Defensa</option><option value="LAT">Lateral</option>
+                        <option value="MCD">Mediocentro Def.</option><option value="VOL">Volante</option><option value="EXT">Extremo</option>
+                        <option value="DEL">Delantero</option>
+                    </select>
+                    <button onclick="crearNuevoJugador()">Crear y Guardar Jugador</button>
+                </div>
+            </section>
+
+            <section class="agregar-resultado">
+                <h2><i class="fa-solid fa-flag-checkered"></i> Finalizar Partido</h2>
+                <div class="finalizar-partido-form"><label for="rival-score-input">Goles del rival:</label><input type="number" id="rival-score-input" min="0" value="0"><button class="finalizar-btn" onclick="finalizarPartido()">Finalizar y Guardar</button></div>
+            </section>
+        </div>
+
+        <div id="vista-estadisticas" class="vista-oculta">
+            <section class="marcadores">
+                <div class="marcador-card"><h2><i class="fa-solid fa-trophy"></i> Ganados</h2><p id="partidos-ganados">0</p></div>
+                <div class="marcador-card"><h2><i class="fa-solid fa-handshake"></i> Empatados</h2><p id="partidos-empatados">0</p></div>
+                <div class="marcador-card"><h2><i class="fa-solid fa-heart-crack"></i> Perdidos</h2><p id="partidos-perdidos">0</p></div>
+            </section>
+            
+            <section class="dashboard">
+                <div class="chart-container"><h2>Rendimiento General</h2><canvas id="rendimiento-chart"></canvas></div>
+                <div class="leaderboard-container"><h2>Líderes del Equipo</h2><table id="tabla-lideres"><thead><tr><th>Jugador</th><th><i class="fa-solid fa-futbol"></i> Goles</th><th><i class="fa-solid fa-hands-helping"></i> Asist.</th></tr></thead><tbody></tbody></table></div>
+            </section>
+
+            <section class="historial-completo">
+                <h2><i class="fa-solid fa-book"></i> Historial de Partidos</h2>
+                <table id="tabla-historial"><thead><tr><th>Fecha</th><th>Rival</th><th>Marcador</th><th>Resultado</th></tr></thead><tbody></tbody></table>
+            </section>
+
+            <section class="zona-peligro">
+                <h2><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h2>
+                <button class="btn-reset-total" onclick="abrirModalReset()">Reiniciar Todas las Estadísticas</button>
+            </section>
+        </div>
+    </main>
+
+    <!-- VENTANAS MODALES -->
+    <div id="modal-confirmacion" class="modal-overlay modal-oculto"><div class="modal-contenido"><h3>Confirmar Eliminación</h3><p>¿Seguro que quieres quitar a <strong id="nombre-jugador-modal"></strong> de la convocatoria?</p><div class="modal-acciones"><button class="btn-cancelar" onclick="cerrarModal('modal-confirmacion')">Cancelar</button><button class="btn-confirmar-eliminar" onclick="confirmarEliminacion()">Confirmar</button></div></div></div>
+    <div id="modal-reset" class="modal-overlay modal-oculto"><div class="modal-contenido"><h3>¡Atención! Acción Irreversible</h3><p>¿Seguro que quieres borrar **TODOS** los datos?</p><div class="modal-acciones"><button class="btn-cancelar" onclick="cerrarModal('modal-reset')">Cancelar</button><button class="btn-confirmar-eliminar" onclick="confirmarResetTotal()">Sí, Reiniciar Todo</button></div></div></div>
+    <div id="modal-stats-jugador" class="modal-overlay modal-oculto"><div class="modal-contenido" id="contenido-stats-jugador"></div></div>
+    <div id="modal-fin-partido" class="modal-overlay modal-oculto"><div class="modal-contenido" id="contenido-fin-partido"></div></div>
+    <div id="modal-alerta" class="modal-overlay modal-oculto"><div class="modal-contenido"><h3 id="alerta-titulo">Atención</h3><p id="alerta-mensaje"></p><div class="modal-acciones"><button class="btn-aceptar" onclick="cerrarModal('modal-alerta')">Aceptar</button></div></div></div>
+    
+    <audio id="sonido-silbato" src="sonidos/silbato.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
