@@ -31,7 +31,7 @@ input:checked + .slider:before { transform: translateX(24px); }
 
 /* --- DASHBOARD Y GRÁFICO --- */
 .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
-.chart-container { position: relative; min-height: 350px; width: 100%; }
+.chart-container { position: relative; height: 350px; width: 100%; } /* <-- ESTA ES LA SOLUCIÓN */
 .leaderboard-container { min-height: 350px; }
 
 /* --- MARCADOR Y EVENTOS --- */
