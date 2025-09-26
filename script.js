@@ -15,6 +15,7 @@ let segundosRestantes = 40 * 60;
 let etapaActual = 1;
 let rendimientoChart = null;
 
+
 // --- LÓGICA DE BASE DE DATOS ---
 async function cargarDatosDesdeLaNube() {
     try {
@@ -24,13 +25,11 @@ async function cargarDatosDesdeLaNube() {
         plantillaCompleta = data.jugadores || [];
         historialDePartidos = data.historial || [];
         const proximoPartidoGuardado = localStorage.getItem('proximoPartido');
-        if (proximoPartidoGuardado) {
-            proximoPartido = JSON.parse(proximoPartidoGuardado);
-        }
+        if (proximoPartidoGuardado) { proximoPartido = JSON.parse(proximoPartidoGuardado); }
         actualizarVista();
     } catch (error) {
         console.error('Error fatal al cargar datos:', error);
-        mostrarAlerta('Error de Conexión', 'No se pudieron cargar los datos desde la base de datos. Revisa tu conexión a internet.');
+        mostrarAlerta('Error de Conexión', 'No se pudieron cargar los datos desde la base de datos.');
     }
 }
 
@@ -61,7 +60,10 @@ async function finalizarPartido() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ partido, jugadoresDelPartido: jugadoresConvocados }),
         });
-        if (!response.ok) throw new Error('El servidor no pudo guardar el partido.');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'El servidor no pudo guardar el partido.');
+        }
         jugadoresConvocados = [];
         proximoPartido = { fecha: "A definir", rival: "A definir" };
         localStorage.removeItem('proximoPartido');
@@ -70,22 +72,16 @@ async function finalizarPartido() {
         cargarDatosDesdeLaNube();
     } catch (error) {
         console.error('Error al finalizar el partido:', error);
-        mostrarAlerta('Error', 'No se pudo guardar el partido en la base de datos.');
+        mostrarAlerta('Error', `No se pudo guardar el partido: ${error.message}`);
     }
 }
 
 // --- GESTIÓN DE JUGADORES ---
 function convocarJugador() {
     const selector = document.getElementById('jugador-select');
-    if (!selector.value) {
-        mostrarAlerta('Error', 'No hay ningún jugador seleccionado.');
-        return;
-    }
+    if (!selector.value) { mostrarAlerta('Error', 'No hay ningún jugador seleccionado.'); return; }
     const jugadorInfo = plantillaCompleta.find(j => j.nombre === selector.value);
-    jugadoresConvocados.push({
-        ...jugadorInfo,
-        statsPartido: { goles: 0, asistencias: 0, amarillas: 0, rojas: 0 }
-    });
+    jugadoresConvocados.push({ ...jugadorInfo, statsPartido: { goles: 0, asistencias: 0, amarillas: 0, rojas: 0 } });
     actualizarVista();
 }
 
@@ -122,9 +118,7 @@ function actualizarEventosDelPartido() {
     const renderizarEventos = (tipo, icono, nombreSingular) => {
         const div = document.getElementById(`lista-${tipo}`);
         if (!div) return;
-        const jugadoresConEvento = jugadoresConvocados
-            .filter(j => j.statsPartido[tipo] > 0)
-            .map(j => `${j.nombre} (${j.statsPartido[tipo]})`);
+        const jugadoresConEvento = jugadoresConvocados.filter(j => j.statsPartido[tipo] > 0).map(j => `${j.nombre} (${j.statsPartido[tipo]})`);
         if (jugadoresConEvento.length > 0) {
             div.innerHTML = `<p>${icono} <strong>${nombreSingular}:</strong> ${jugadoresConEvento.join(', ')}</p>`;
         } else {
@@ -210,10 +204,32 @@ function pausarTimer() { clearInterval(timerInterval); timerInterval = null; }
 function resetTimer(resetearEtapa = true) { pausarTimer(); segundosRestantes = 40 * 60; if (resetearEtapa) { etapaActual = 1; } actualizarDisplayTimer(); }
 function actualizarDisplayTimer() { const m = Math.floor(segundosRestantes / 60); const s = segundosRestantes % 60; document.getElementById('cronometro').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; document.getElementById('etapa-tiempo').textContent = etapaActual === 1 ? '1er Tiempo' : '2do Tiempo'; }
 function reproducirSilbato() { document.getElementById('sonido-silbato').play(); }
-function abrirModal(id) { document.getElementById(id).classList.remove('modal-oculto'); }
-function cerrarModal(id) { document.getElementById(id).classList.add('modal-oculto'); }
+function abrirModal(id) { document.getElementById(id).classList.remove('modal-oculta'); }
+function cerrarModal(id) { document.getElementById(id).classList.add('modal-oculta'); }
 function mostrarAlerta(titulo, mensaje) { document.getElementById('alerta-titulo').textContent = titulo; document.getElementById('alerta-mensaje').textContent = mensaje; abrirModal('modal-alerta'); }
 function abrirModalConfirmacion(index, nombre) { indiceJugadorAEliminar = index; document.getElementById('nombre-jugador-modal').textContent = nombre; abrirModal('modal-confirmacion'); }
 function actualizarEstadistica(index, tipo, accion) { const j = jugadoresConvocados[index]; if (accion === 'sumar') j.statsPartido[tipo]++; else if (accion === 'restar' && j.statsPartido[tipo] > 0) j.statsPartido[tipo]--; actualizarVista(); }
 function actualizarProximoPartido() { const f = document.getElementById('input-fecha'), r = document.getElementById('input-rival'); if (f.value && r.value.trim()) { proximoPartido.fecha = new Date(f.value + 'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); proximoPartido.rival = r.value.trim(); f.value = ''; r.value = ''; localStorage.setItem('proximoPartido', JSON.stringify(proximoPartido)); actualizarVista(); } else { mostrarAlerta('Datos incompletos', 'Por favor, completa la fecha y el nombre del rival.'); } }
-function abrirModalReset() { mostrarAlerta('Función Deshabilitada', 'La opción de reinicio total está en mantenimiento para proteger los datos de la nube.'); }
+
+// --- FUNCIÓN DE RESETEO ---
+function abrirModalReset() {
+    abrirModal('modal-reset');
+}
+async function confirmarResetTotal() {
+    cerrarModal('modal-reset');
+    mostrarAlerta('Procesando...', 'Reiniciando todas las estadísticas. Por favor, espera.');
+    try {
+        const response = await fetch('/.netlify/functions/reset-all-stats', {
+            method: 'POST'
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'El servidor no pudo reiniciar los datos.');
+        }
+        mostrarAlerta('¡Éxito!', 'Todas las estadísticas han sido borradas de la nube.');
+        cargarDatosDesdeLaNube();
+    } catch (error) {
+        console.error('Error al reiniciar estadísticas:', error);
+        mostrarAlerta('Error', `No se pudo completar el reinicio: ${error.message}`);
+    }
+}
