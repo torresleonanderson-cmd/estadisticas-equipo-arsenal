@@ -32,13 +32,13 @@ input:checked + .slider:before { transform: translateX(24px); }
 /* --- DASHBOARD Y GRÁFICO --- */
 .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
 .chart-container { position: relative; height: 350px; width: 100%; }
-.dashboard-grid > section { margin-bottom: 0; } /* Quitamos el margen de las secciones internas */
+.dashboard-grid > section { margin-bottom: 0; }
 
 /* --- MARCADOR Y EVENTOS --- */
 .marcador-partido { text-align: center; }
 .marcador-display h1 { font-size: clamp(3rem, 10vw, 4.5rem); color: var(--color-arsenal-azul); margin: 10px 0; }
-.eventos-container { margin-top: 15px; color: var(--color-texto-secundario); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
-.eventos-partido p { margin: 0; }
+.eventos-container { margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--color-borde); color: var(--color-texto-secundario); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+.eventos-partido p { margin: 0; font-size: 0.9em; }
 
 /* --- BOTONES Y FORMULARIOS --- */
 button { background-color: var(--color-arsenal-azul); color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s, background-color 0.2s; }
@@ -92,33 +92,15 @@ input, select { padding: 12px; border: 1px solid var(--color-borde); background-
     header h1 { font-size: 1.3rem; }
     .theme-switch-wrapper { display: none; }
     .vista-navegacion, .marcadores, .form-partido, .finalizar-partido-form, .form-jugador, .form-crear-jugador { flex-direction: column; }
-    
-    /* 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN FINAL! 👇 */
-    /* Hacemos que el dashboard sea de una sola columna en pantallas pequeñas */
-    .dashboard-grid { 
-        grid-template-columns: 1fr; 
-    }
-
+    .dashboard-grid { grid-template-columns: 1fr; }
     .chart-container { min-height: 300px; height: 40vh; }
     .eventos-container { grid-template-columns: 1fr; }
     input, select, button { width: 100%; margin: 5px 0; box-sizing: border-box; }
 }
 
 /* --- ESTILOS RESPONSIVE PARA TABLAS --- */
-.tabla-responsive-container {
-    overflow-x: auto; /* ¡La línea mágica que crea el scroll horizontal! */
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
-}
-
-/* Forzamos un ancho mínimo para que el scroll siempre funcione si es necesario */
-#tabla-jugadores, #tabla-lideres, #tabla-historial {
-    min-width: 500px;
-}
-
-/* Reducimos el espacio y evitamos que el texto se rompa en las celdas */
+.tabla-responsive-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#tabla-jugadores, #tabla-lideres, #tabla-historial { min-width: 500px; }
 #tabla-jugadores th, #tabla-jugadores td,
 #tabla-lideres th, #tabla-lideres td,
-#tabla-historial th, #tabla-historial td {
-    padding: 12px 8px;
-    white-space: nowrap;
-}
+#tabla-historial th, #tabla-historial td { padding: 12px 8px; white-space: nowrap; }
