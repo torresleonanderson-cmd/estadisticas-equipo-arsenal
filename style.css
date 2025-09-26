@@ -1,6 +1,6 @@
 /* --- VARIABLES DE COLOR --- */
 :root { --color-fondo: #f0f2f5; --color-superficie: white; --color-texto-principal: #333; --color-texto-secundario: #666; --color-borde: #ddd; --color-arsenal-azul: #023474; --color-arsenal-rojo: #db0007; --color-victoria: #28a745; --color-empate: #6c757d; --color-derrota: #dc3545; --color-amarillo: #ffc107; --color-amarillo-tarjeta: #ffd900; }
-.dark-mode { --color-fondo: #121212; --color-superficie: #1e1e1e; --color-texto-principal: #e0e0e0; --color-texto-secundario: #a0a0e0; --color-borde: #444; }
+.dark-mode { --color-fondo: #121212; --color-superficie: #1e1e1e; --color-texto-principal: #e0e0e0; --color-texto-secundario: #a0a0a0; --color-borde: #444; }
 
 /* --- ESTILOS GENERALES Y LAYOUT --- */
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--color-fondo); color: var(--color-texto-principal); margin: 0; padding: 10px 20px; transition: background-color 0.3s, color 0.3s; }
@@ -30,9 +30,9 @@ input:checked + .slider:before { transform: translateX(24px); }
 .vista-oculta { display: none; }
 
 /* --- DASHBOARD Y GRÁFICO --- */
-.dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
 .chart-container { position: relative; height: 350px; width: 100%; }
-.leaderboard-container { min-height: 350px; }
+.dashboard-grid > section { margin-bottom: 0; } /* Quitamos el margen de las secciones internas */
 
 /* --- MARCADOR Y EVENTOS --- */
 .marcador-partido { text-align: center; }
@@ -66,7 +66,7 @@ input, select { padding: 12px; border: 1px solid var(--color-borde); background-
 .marcador-card p { font-size: 2.5em; font-weight: bold; color: var(--color-arsenal-rojo); margin-top: 10px; }
 .tiempo-partido { text-align: center; }
 .cronometro-display { font-size: 3.5em; font-weight: bold; color: var(--color-arsenal-azul); margin: 10px 0; }
-#tabla-jugadores, #tabla-historial, #tabla-lideres { width: 100%; border-collapse: collapse; margin-top: 20px; }
+#tabla-jugadores, #tabla-historial, #tabla-lideres { width: 100%; border-collapse: collapse; margin-top: 10px; }
 #tabla-jugadores th, #tabla-historial th, #tabla-lideres th { background-color: var(--color-fondo); }
 #tabla-jugadores th, td, #tabla-historial th, td, #tabla-lideres th, td { border: 1px solid var(--color-borde); padding: 10px; text-align: center; vertical-align: middle; }
 .clickable-row { cursor: pointer; transition: background-color 0.2s; }
@@ -93,9 +93,9 @@ input, select { padding: 12px; border: 1px solid var(--color-borde); background-
     .theme-switch-wrapper { display: none; }
     .vista-navegacion, .marcadores, .form-partido, .finalizar-partido-form, .form-jugador, .form-crear-jugador { flex-direction: column; }
     
-    /* 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN MÁGICA! 👇 */
+    /* 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN FINAL! 👇 */
     /* Hacemos que el dashboard sea de una sola columna en pantallas pequeñas */
-    .dashboard { 
+    .dashboard-grid { 
         grid-template-columns: 1fr; 
     }
 
@@ -108,15 +108,11 @@ input, select { padding: 12px; border: 1px solid var(--color-borde); background-
 .tabla-responsive-container {
     overflow-x: auto; /* ¡La línea mágica que crea el scroll horizontal! */
     -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
-    padding-bottom: 5px;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
-    margin-top: 20px;
 }
 
 /* Forzamos un ancho mínimo para que el scroll siempre funcione si es necesario */
 #tabla-jugadores, #tabla-lideres, #tabla-historial {
-    min-width: 650px;
+    min-width: 500px;
 }
 
 /* Reducimos el espacio y evitamos que el texto se rompa en las celdas */
