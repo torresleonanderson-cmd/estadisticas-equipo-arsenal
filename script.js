@@ -244,3 +244,47 @@ async function confirmarResetTotal() {
         mostrarAlerta('Error', `No se pudo completar el reinicio: ${error.message}`);
     }
 }
+
+
+// --- PEGA ESTA NUEVA FUNCIÓN AL FINAL DE TU ARCHIVO SCRIPT.JS ---
+
+async function crearNuevoJugador() {
+    const nombreInput = document.getElementById('nuevo-jugador-nombre');
+    const posicionSelect = document.getElementById('nuevo-jugador-posicion');
+
+    const nombre = nombreInput.value.trim(); // .trim() elimina espacios en blanco al inicio y final
+    const posicion = posicionSelect.value;
+
+    // 1. Validación para mostrar tu modal elegante
+    if (!nombre) {
+        mostrarAlerta('Campo Requerido', 'Por favor, introduce el nombre del nuevo jugador.');
+        return; // Detiene la ejecución si el nombre está vacío
+    }
+
+    // 2. Enviar los datos a la función de Netlify
+    try {
+        const response = await fetch('/.netlify/functions/add-jugador', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, posicion }),
+        });
+
+        // 3. Manejar la respuesta del servidor
+        if (response.ok) {
+            const nuevoJugador = await response.json();
+            mostrarAlerta('¡Éxito!', `El jugador "${nuevoJugador.nombre}" ha sido guardado correctamente.`);
+            nombreInput.value = ''; // Limpiamos el campo de texto
+            cargarDatosDesdeLaNube(); // ¡Muy importante! Recargamos los datos para actualizar la lista.
+        } else {
+            // Manejar errores específicos, como un jugador duplicado
+            if (response.status === 409) { // 409 Conflict es el error de duplicado que programaste
+                 mostrarAlerta('Jugador Duplicado', 'Ya existe un jugador con ese nombre en la plantilla.');
+            } else {
+                 throw new Error('El servidor no pudo guardar al jugador.');
+            }
+        }
+    } catch (error) {
+        console.error('Error al intentar crear el jugador:', error);
+        mostrarAlerta('Error de Red', 'No se pudo conectar con el servidor. Inténtalo de nuevo.');
+    }
+}
