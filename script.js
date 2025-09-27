@@ -1,5 +1,5 @@
 // ==================================================================
-// ARCHIVO SCRIPT.JS COMPLETO Y CORREGIDO (VERSIÓN BLINDADA)
+// ARCHIVO SCRIPT.JS - VERSIÓN CON CORRECCIÓN DE FECHA DEFINITIVA
 // ==================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,8 +52,8 @@ async function finalizarPartido() {
     const golesNuestros = jugadoresConvocados.reduce((total, j) => total + j.statsPartido.goles, 0);
     const resultado = golesNuestros > golesRival ? 'victoria' : golesNuestros < golesRival ? 'derrota' : 'empate';
     const partido = {
-        // LÍNEA CORRECTA Y DEFINITIVA
-fecha: new Date().toISOString(),
+        // --- ¡AQUÍ ESTÁ LA CORRECCIÓN DEFINITIVA! ---
+        fecha: new Date().toISOString(), // Guardamos fecha Y hora completas.
         rival: proximoPartido.rival,
         goles_nuestros: golesNuestros,
         goles_rival: golesRival,
@@ -78,6 +78,8 @@ fecha: new Date().toISOString(),
         mostrarAlerta('Error', `No se pudo guardar el partido: ${error.message}`);
     }
 }
+
+// ... (El resto del código es idéntico al que te pasé la última vez, no necesita más cambios)
 
 // --- GESTIÓN DE JUGADORES ---
 function convocarJugador() {
@@ -151,11 +153,10 @@ function actualizarTablaLideres() {
 function actualizarTablaHistorial() {
     const tbody = document.querySelector('#tabla-historial tbody');
     tbody.innerHTML = '';
-    // DOBLE SEGURO: Ordenamos el historial aquí también para la tabla visual.
     const historialOrdenadoParaTabla = [...historialDePartidos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     historialOrdenadoParaTabla.forEach(p => {
         const fila = document.createElement('tr');
-        const fechaFormateada = new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
         fila.innerHTML = `<td>${fechaFormateada}</td><td>${p.rival}</td><td>${p.goles_nuestros} - ${p.goles_rival}</td><td><span class="resultado-historial ${p.resultado}">${p.resultado.charAt(0).toUpperCase() + p.resultado.slice(1)}</span></td>`;
         tbody.appendChild(fila);
     });
@@ -335,7 +336,6 @@ function cerrarYRefrescar() {
 
 // --- FUNCIÓN DE RACHAS (VERSIÓN BLINDADA Y CORREGIDA) ---
 function calcularYMostrarRachas(historial) {
-    // CORRECCIÓN: Nos aseguramos de que el historial SIEMPRE esté ordenado del más nuevo al más viejo.
     const historialOrdenado = [...historial].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
     if (historialOrdenado.length === 0) {
@@ -350,7 +350,6 @@ function calcularYMostrarRachas(historial) {
     let rachaVictoriasActiva = true;
     let rachaInvictoActiva = true;
 
-    // Usamos el historial ya ordenado para todos los cálculos.
     for (const partido of historialOrdenado) {
         if (partido.resultado === 'victoria' && rachaVictoriasActiva) {
             rachaVictorias++;
