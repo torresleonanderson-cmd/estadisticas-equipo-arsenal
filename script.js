@@ -226,11 +226,21 @@ async function confirmarResetTotal() {
             const errorData = await response.json();
             throw new Error(errorData.error || 'El servidor no pudo reiniciar los datos.');
         }
+
+        // --- LÍNEAS AÑADIDAS ---
+        // 1. Limpiamos el dato guardado en el navegador.
+        localStorage.removeItem('proximoPartido'); 
+        // 2. Reseteamos la variable que usa el script para que los cambios se vean al instante.
+        proximoPartido = { fecha: "A definir", rival: "A definir" };
+        // ------------------------
+
         mostrarAlerta('¡Éxito!', 'Todas las estadísticas han sido borradas de la nube.');
-        cargarDatosDesdeLaNube();
+        
+        // Ahora, al llamar a esta función, ya no encontrará datos guardados y mostrará todo desde cero.
+        cargarDatosDesdeLaNube(); 
+        
     } catch (error) {
         console.error('Error al reiniciar estadísticas:', error);
         mostrarAlerta('Error', `No se pudo completar el reinicio: ${error.message}`);
     }
 }
-
