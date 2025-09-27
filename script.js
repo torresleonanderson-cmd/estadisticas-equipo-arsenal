@@ -33,6 +33,8 @@ async function cargarDatosDesdeLaNube() {
     }
 }
 
+// --- REEMPLAZA TU FUNCIÓN finalizarPartido() EXISTENTE CON ESTA ---
+
 async function finalizarPartido() {
     if (proximoPartido.rival === 'A definir' || proximoPartido.fecha === 'A definir') {
         mostrarAlerta('Acción no permitida', 'Primero debes programar un partido.');
@@ -54,6 +56,7 @@ async function finalizarPartido() {
         goles_rival: golesRival,
         resultado,
     };
+
     try {
         const response = await fetch('/.netlify/functions/finalize-match', {
             method: 'POST',
@@ -64,12 +67,12 @@ async function finalizarPartido() {
             const errorData = await response.json();
             throw new Error(errorData.error || 'El servidor no pudo guardar el partido.');
         }
-        jugadoresConvocados = [];
-        proximoPartido = { fecha: "A definir", rival: "A definir" };
-        localStorage.removeItem('proximoPartido');
-        document.getElementById('rival-score-input').value = '0';
-        mostrarAlerta('¡Éxito!', 'El partido y las estadísticas se han guardado en la nube.');
-        cargarDatosDesdeLaNube();
+
+        // --- CAMBIO IMPORTANTE ---
+        // En lugar de una alerta genérica y limpiar aquí, llamamos a nuestro nuevo modal.
+        // La limpieza y la recarga de datos se harán al cerrar el modal.
+        mostrarModalFinPartido(resultado, golesNuestros, golesRival);
+        
     } catch (error) {
         console.error('Error al finalizar el partido:', error);
         mostrarAlerta('Error', `No se pudo guardar el partido: ${error.message}`);
@@ -287,4 +290,57 @@ async function crearNuevoJugador() {
         console.error('Error al intentar crear el jugador:', error);
         mostrarAlerta('Error de Red', 'No se pudo conectar con el servidor. Inténtalo de nuevo.');
     }
+}
+
+// --- PEGA ESTA NUEVA FUNCIÓN AL FINAL DE TU ARCHIVO SCRIPT.JS ---
+
+function mostrarModalFinPartido(resultado, nuestrosGoles, rivalGoles) {
+    const contenido = document.getElementById('contenido-fin-partido');
+    let titulo = '';
+    let claseModal = '';
+
+    switch (resultado) {
+        case 'victoria':
+            titulo = '¡¡VICTORIA!!';
+            claseModal = 'modal-victoria';
+            break;
+        case 'derrota':
+            titulo = 'Derrota';
+            claseModal = 'modal-derrota';
+            break;
+        case 'empate':
+            titulo = 'Empate';
+            claseModal = 'modal-empate';
+            break;
+    }
+
+    // Construimos el contenido del modal
+    contenido.innerHTML = `
+        <h2>${titulo}</h2>
+        <h3>Resultado Final</h3>
+        <h1>${nuestrosGoles} - ${rivalGoles}</h1>
+        <div class="modal-acciones">
+            <button class="btn-aceptar" onclick="cerrarYRefrescar()">Aceptar</button>
+        </div>
+    `;
+
+    // Limpiamos clases viejas y añadimos la nueva para el color de fondo
+    contenido.classList.remove('modal-victoria', 'modal-derrota', 'modal-empate');
+    contenido.classList.add(claseModal);
+
+    abrirModal('modal-fin-partido');
+}
+
+// También necesitamos una función para cerrar el modal y limpiar la app
+function cerrarYRefrescar() {
+    cerrarModal('modal-fin-partido');
+
+    // Limpiamos los datos del partido anterior
+    jugadoresConvocados = [];
+    proximoPartido = { fecha: "A definir", rival: "A definir" };
+    localStorage.removeItem('proximoPartido');
+    document.getElementById('rival-score-input').value = '0';
+
+    // ¡Clave! Recargamos todo desde la nube para actualizar las estadísticas
+    cargarDatosDesdeLaNube();
 }
