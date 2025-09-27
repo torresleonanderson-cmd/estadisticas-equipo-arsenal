@@ -212,12 +212,9 @@ function actualizarEstadistica(index, tipo, accion) { const j = jugadoresConvoca
 function actualizarProximoPartido() { const f = document.getElementById('input-fecha'), r = document.getElementById('input-rival'); if (f.value && r.value.trim()) { proximoPartido.fecha = new Date(f.value + 'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); proximoPartido.rival = r.value.trim(); f.value = ''; r.value = ''; localStorage.setItem('proximoPartido', JSON.stringify(proximoPartido)); actualizarVista(); } else { mostrarAlerta('Datos incompletos', 'Por favor, completa la fecha y el nombre del rival.'); } }
 
 // --- FUNCIÓN DE RESETEO ---
-// 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN! Esta función ahora abre el modal de confirmación. 👇
 function abrirModalReset() {
     abrirModal('modal-reset');
 }
-
-// Esta es la función que se llama DESPUÉS de confirmar en el modal
 async function confirmarResetTotal() {
     cerrarModal('modal-reset');
     mostrarAlerta('Procesando...', 'Reiniciando todas las estadísticas. Por favor, espera.');
@@ -236,3 +233,4 @@ async function confirmarResetTotal() {
         mostrarAlerta('Error', `No se pudo completar el reinicio: ${error.message}`);
     }
 }
+

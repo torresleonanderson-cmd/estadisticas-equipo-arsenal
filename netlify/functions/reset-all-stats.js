@@ -1,10 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 
 exports.handler = async function(event, context) {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-  
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_ANON_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey);
@@ -14,7 +10,7 @@ exports.handler = async function(event, context) {
     const { error: deleteError } = await supabase
       .from('historial_partidos')
       .delete()
-      .neq('id', -1); // Condición para borrar todo, ahora sí funcionará
+      .neq('id', -1); // Condición para borrar todo
 
     if (deleteError) throw deleteError;
 
@@ -27,7 +23,7 @@ exports.handler = async function(event, context) {
         amarillas_totales: 0,
         rojas_totales: 0
       })
-      .neq('id', -1); // Esto usa el 'id' de la tabla jugadores, que ya existía y está bien
+      .neq('id', -1); // Condición para actualizar a todos
 
     if (updateError) throw updateError;
 
