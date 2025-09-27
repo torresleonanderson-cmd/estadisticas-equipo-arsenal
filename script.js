@@ -1,5 +1,5 @@
 // ==================================================================
-// ARCHIVO SCRIPT.JS COMPLETO Y CORREGIDO
+// ARCHIVO SCRIPT.JS COMPLETO Y CORREGIDO (VERSIÓN BLINDADA)
 // ==================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -150,7 +150,7 @@ function actualizarTablaLideres() {
 function actualizarTablaHistorial() {
     const tbody = document.querySelector('#tabla-historial tbody');
     tbody.innerHTML = '';
-    // Ordenamos el historial para mostrarlo en la tabla del más reciente al más antiguo
+    // DOBLE SEGURO: Ordenamos el historial aquí también para la tabla visual.
     const historialOrdenadoParaTabla = [...historialDePartidos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     historialOrdenadoParaTabla.forEach(p => {
         const fila = document.createElement('tr');
@@ -332,7 +332,7 @@ function cerrarYRefrescar() {
     cargarDatosDesdeLaNube();
 }
 
-// --- FUNCIÓN DE RACHAS (VERSIÓN CORREGIDA) ---
+// --- FUNCIÓN DE RACHAS (VERSIÓN BLINDADA Y CORREGIDA) ---
 function calcularYMostrarRachas(historial) {
     // CORRECCIÓN: Nos aseguramos de que el historial SIEMPRE esté ordenado del más nuevo al más viejo.
     const historialOrdenado = [...historial].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
