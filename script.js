@@ -1,3 +1,7 @@
+// ==================================================================
+// ARCHIVO SCRIPT.JS COMPLETO Y CORREGIDO
+// ==================================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     cargarDatosDesdeLaNube();
     aplicarTemaGuardado();
@@ -33,8 +37,6 @@ async function cargarDatosDesdeLaNube() {
     }
 }
 
-// --- REEMPLAZA TU FUNCIÓN finalizarPartido() EXISTENTE CON ESTA ---
-
 async function finalizarPartido() {
     if (proximoPartido.rival === 'A definir' || proximoPartido.fecha === 'A definir') {
         mostrarAlerta('Acción no permitida', 'Primero debes programar un partido.');
@@ -68,9 +70,6 @@ async function finalizarPartido() {
             throw new Error(errorData.error || 'El servidor no pudo guardar el partido.');
         }
 
-        // --- CAMBIO IMPORTANTE ---
-        // En lugar de una alerta genérica y limpiar aquí, llamamos a nuestro nuevo modal.
-        // La limpieza y la recarga de datos se harán al cerrar el modal.
         mostrarModalFinPartido(resultado, golesNuestros, golesRival);
         
     } catch (error) {
@@ -105,8 +104,7 @@ function actualizarVista() {
     document.getElementById('partidos-empatados').textContent = partidosEmpatados;
     document.getElementById('partidos-perdidos').textContent = partidosPerdidos;
 
-     // --- LÍNEA AÑADIDA ---
-    calcularYMostrarRachas(historialDePartidos); // ¡Añade esta línea aquí!
+    calcularYMostrarRachas(historialDePartidos);
     
     actualizarTablaLideres();
     actualizarTablaHistorial();
@@ -152,9 +150,11 @@ function actualizarTablaLideres() {
 function actualizarTablaHistorial() {
     const tbody = document.querySelector('#tabla-historial tbody');
     tbody.innerHTML = '';
-    historialDePartidos.forEach(p => {
+    // Ordenamos el historial para mostrarlo en la tabla del más reciente al más antiguo
+    const historialOrdenadoParaTabla = [...historialDePartidos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    historialOrdenadoParaTabla.forEach(p => {
         const fila = document.createElement('tr');
-        const fechaFormateada = new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-ES');
+        const fechaFormateada = new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
         fila.innerHTML = `<td>${fechaFormateada}</td><td>${p.rival}</td><td>${p.goles_nuestros} - ${p.goles_rival}</td><td><span class="resultado-historial ${p.resultado}">${p.resultado.charAt(0).toUpperCase() + p.resultado.slice(1)}</span></td>`;
         tbody.appendChild(fila);
     });
@@ -219,9 +219,6 @@ function actualizarEstadistica(index, tipo, accion) { const j = jugadoresConvoca
 function actualizarProximoPartido() { const f = document.getElementById('input-fecha'), r = document.getElementById('input-rival'); if (f.value && r.value.trim()) { proximoPartido.fecha = new Date(f.value + 'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); proximoPartido.rival = r.value.trim(); f.value = ''; r.value = ''; localStorage.setItem('proximoPartido', JSON.stringify(proximoPartido)); actualizarVista(); } else { mostrarAlerta('Datos incompletos', 'Por favor, completa la fecha y el nombre del rival.'); } }
 
 // --- FUNCIÓN DE RESETEO ---
-function abrirModalReset() {
-    abrirModal('modal-reset');
-}
 async function confirmarResetTotal() {
     cerrarModal('modal-reset');
     mostrarAlerta('Procesando...', 'Reiniciando todas las estadísticas. Por favor, espera.');
@@ -234,16 +231,11 @@ async function confirmarResetTotal() {
             throw new Error(errorData.error || 'El servidor no pudo reiniciar los datos.');
         }
 
-        // --- LÍNEAS AÑADIDAS ---
-        // 1. Limpiamos el dato guardado en el navegador.
         localStorage.removeItem('proximoPartido'); 
-        // 2. Reseteamos la variable que usa el script para que los cambios se vean al instante.
         proximoPartido = { fecha: "A definir", rival: "A definir" };
-        // ------------------------
 
         mostrarAlerta('¡Éxito!', 'Todas las estadísticas han sido borradas de la nube.');
         
-        // Ahora, al llamar a esta función, ya no encontrará datos guardados y mostrará todo desde cero.
         cargarDatosDesdeLaNube(); 
         
     } catch (error) {
@@ -252,23 +244,22 @@ async function confirmarResetTotal() {
     }
 }
 
+function abrirModalReset() {
+    abrirModal('modal-reset');
+}
 
-// --- PEGA ESTA NUEVA FUNCIÓN AL FINAL DE TU ARCHIVO SCRIPT.JS ---
-
+// --- GESTIÓN DE JUGADORES (CREACIÓN) ---
 async function crearNuevoJugador() {
     const nombreInput = document.getElementById('nuevo-jugador-nombre');
     const posicionSelect = document.getElementById('nuevo-jugador-posicion');
-
-    const nombre = nombreInput.value.trim(); // .trim() elimina espacios en blanco al inicio y final
+    const nombre = nombreInput.value.trim();
     const posicion = posicionSelect.value;
 
-    // 1. Validación para mostrar tu modal elegante
     if (!nombre) {
         mostrarAlerta('Campo Requerido', 'Por favor, introduce el nombre del nuevo jugador.');
-        return; // Detiene la ejecución si el nombre está vacío
+        return;
     }
 
-    // 2. Enviar los datos a la función de Netlify
     try {
         const response = await fetch('/.netlify/functions/add-jugador', {
             method: 'POST',
@@ -276,15 +267,13 @@ async function crearNuevoJugador() {
             body: JSON.stringify({ nombre, posicion }),
         });
 
-        // 3. Manejar la respuesta del servidor
         if (response.ok) {
             const nuevoJugador = await response.json();
             mostrarAlerta('¡Éxito!', `El jugador "${nuevoJugador.nombre}" ha sido guardado correctamente.`);
-            nombreInput.value = ''; // Limpiamos el campo de texto
-            cargarDatosDesdeLaNube(); // ¡Muy importante! Recargamos los datos para actualizar la lista.
+            nombreInput.value = '';
+            cargarDatosDesdeLaNube();
         } else {
-            // Manejar errores específicos, como un jugador duplicado
-            if (response.status === 409) { // 409 Conflict es el error de duplicado que programaste
+            if (response.status === 409) {
                  mostrarAlerta('Jugador Duplicado', 'Ya existe un jugador con ese nombre en la plantilla.');
             } else {
                  throw new Error('El servidor no pudo guardar al jugador.');
@@ -296,8 +285,7 @@ async function crearNuevoJugador() {
     }
 }
 
-// --- PEGA ESTA NUEVA FUNCIÓN AL FINAL DE TU ARCHIVO SCRIPT.JS ---
-
+// --- MODAL DE FIN DE PARTIDO ---
 function mostrarModalFinPartido(resultado, nuestrosGoles, rivalGoles) {
     const contenido = document.getElementById('contenido-fin-partido');
     let titulo = '';
@@ -318,7 +306,6 @@ function mostrarModalFinPartido(resultado, nuestrosGoles, rivalGoles) {
             break;
     }
 
-    // Construimos el contenido del modal
     contenido.innerHTML = `
         <h2>${titulo}</h2>
         <h3>Resultado Final</h3>
@@ -328,33 +315,29 @@ function mostrarModalFinPartido(resultado, nuestrosGoles, rivalGoles) {
         </div>
     `;
 
-    // Limpiamos clases viejas y añadimos la nueva para el color de fondo
     contenido.classList.remove('modal-victoria', 'modal-derrota', 'modal-empate');
     contenido.classList.add(claseModal);
 
     abrirModal('modal-fin-partido');
 }
 
-// También necesitamos una función para cerrar el modal y limpiar la app
 function cerrarYRefrescar() {
     cerrarModal('modal-fin-partido');
 
-    // Limpiamos los datos del partido anterior
     jugadoresConvocados = [];
     proximoPartido = { fecha: "A definir", rival: "A definir" };
     localStorage.removeItem('proximoPartido');
     document.getElementById('rival-score-input').value = '0';
 
-    // ¡Clave! Recargamos todo desde la nube para actualizar las estadísticas
     cargarDatosDesdeLaNube();
 }
 
-// --- FUNCIÓN NUEVA PARA CALCULAR LAS RACHAS ---
+// --- FUNCIÓN DE RACHAS (VERSIÓN CORREGIDA) ---
 function calcularYMostrarRachas(historial) {
-    // Es crucial que el historial venga ordenado del más reciente al más antiguo.
-    // Tu función get-all-data.js ya lo hace, ¡así que perfecto!
+    // CORRECCIÓN: Nos aseguramos de que el historial SIEMPRE esté ordenado del más nuevo al más viejo.
+    const historialOrdenado = [...historial].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    if (historial.length === 0) {
+    if (historialOrdenado.length === 0) {
         document.getElementById('racha-victorias').textContent = '0';
         document.getElementById('racha-invicto').textContent = '0';
         document.getElementById('partidos-sin-ganar').textContent = '0';
@@ -366,35 +349,29 @@ function calcularYMostrarRachas(historial) {
     let rachaVictoriasActiva = true;
     let rachaInvictoActiva = true;
 
-    // Calculamos las rachas actuales (desde el último partido hacia atrás)
-    for (const partido of historial) {
-        // Racha de victorias
+    // Usamos el historial ya ordenado para todos los cálculos.
+    for (const partido of historialOrdenado) {
         if (partido.resultado === 'victoria' && rachaVictoriasActiva) {
             rachaVictorias++;
         } else {
-            rachaVictoriasActiva = false; // La racha se rompió
+            rachaVictoriasActiva = false;
         }
 
-        // Racha de invicto
         if ((partido.resultado === 'victoria' || partido.resultado === 'empate') && rachaInvictoActiva) {
             rachaInvicto++;
         } else {
-            rachaInvictoActiva = false; // La racha se rompió
+            rachaInvictoActiva = false;
         }
     }
 
-    // Calculamos los partidos desde la última victoria
-    const indiceUltimaVictoria = historial.findIndex(p => p.resultado === 'victoria');
+    const indiceUltimaVictoria = historialOrdenado.findIndex(p => p.resultado === 'victoria');
     let partidosSinGanar = 0;
     if (indiceUltimaVictoria === -1) {
-        // Nunca se ha ganado
-        partidosSinGanar = historial.length;
+        partidosSinGanar = historialOrdenado.length;
     } else {
-        // El índice nos dice cuántos partidos sin ganar hubo antes de la victoria
         partidosSinGanar = indiceUltimaVictoria;
     }
 
-    // Actualizamos los valores en la página
     document.getElementById('racha-victorias').textContent = rachaVictorias;
     document.getElementById('racha-invicto').textContent = rachaInvicto;
     document.getElementById('partidos-sin-ganar').textContent = partidosSinGanar;
