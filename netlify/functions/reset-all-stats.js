@@ -7,14 +7,16 @@ exports.handler = async function(event, context) {
 
   try {
     // 1. Borrar todo el historial de partidos
+    // Usamos una columna que sí existe, como 'rival', para asegurarnos de borrar todo
     const { error: deleteError } = await supabase
       .from('historial_partidos')
       .delete()
-      .neq('id', -1); // Condición para borrar todo
+      .not('rival', 'is', null); // BORRA todas las filas que tengan un rival (o sea, todas)
 
     if (deleteError) throw deleteError;
 
     // 2. Reiniciar las estadísticas de TODOS los jugadores a cero
+    // Usamos la columna 'nombre' que sabemos que existe en todos los jugadores
     const { error: updateError } = await supabase
       .from('jugadores')
       .update({
@@ -23,7 +25,7 @@ exports.handler = async function(event, context) {
         amarillas_totales: 0,
         rojas_totales: 0
       })
-      .neq('id', -1); // Condición para actualizar a todos
+      .not('nombre', 'is', null); // ACTUALIZA a todos los jugadores que tengan un nombre (o sea, todos)
 
     if (updateError) throw updateError;
 
