@@ -52,7 +52,8 @@ async function finalizarPartido() {
     const golesNuestros = jugadoresConvocados.reduce((total, j) => total + j.statsPartido.goles, 0);
     const resultado = golesNuestros > golesRival ? 'victoria' : golesNuestros < golesRival ? 'derrota' : 'empate';
     const partido = {
-        fecha: new Date().toISOString().split('T')[0],
+        // LÍNEA CORRECTA Y DEFINITIVA
+fecha: new Date().toISOString(),
         rival: proximoPartido.rival,
         goles_nuestros: golesNuestros,
         goles_rival: golesRival,
