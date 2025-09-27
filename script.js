@@ -104,6 +104,10 @@ function actualizarVista() {
     document.getElementById('partidos-ganados').textContent = partidosGanados;
     document.getElementById('partidos-empatados').textContent = partidosEmpatados;
     document.getElementById('partidos-perdidos').textContent = partidosPerdidos;
+
+     // --- LÍNEA AÑADIDA ---
+    calcularYMostrarRachas(historialDePartidos); // ¡Añade esta línea aquí!
+    
     actualizarTablaLideres();
     actualizarTablaHistorial();
     actualizarGraficoRendimiento(partidosGanados, partidosEmpatados, partidosPerdidos);
@@ -343,4 +347,55 @@ function cerrarYRefrescar() {
 
     // ¡Clave! Recargamos todo desde la nube para actualizar las estadísticas
     cargarDatosDesdeLaNube();
+}
+
+// --- FUNCIÓN NUEVA PARA CALCULAR LAS RACHAS ---
+function calcularYMostrarRachas(historial) {
+    // Es crucial que el historial venga ordenado del más reciente al más antiguo.
+    // Tu función get-all-data.js ya lo hace, ¡así que perfecto!
+
+    if (historial.length === 0) {
+        document.getElementById('racha-victorias').textContent = '0';
+        document.getElementById('racha-invicto').textContent = '0';
+        document.getElementById('partidos-sin-ganar').textContent = '0';
+        return;
+    }
+
+    let rachaVictorias = 0;
+    let rachaInvicto = 0;
+    let rachaVictoriasActiva = true;
+    let rachaInvictoActiva = true;
+
+    // Calculamos las rachas actuales (desde el último partido hacia atrás)
+    for (const partido of historial) {
+        // Racha de victorias
+        if (partido.resultado === 'victoria' && rachaVictoriasActiva) {
+            rachaVictorias++;
+        } else {
+            rachaVictoriasActiva = false; // La racha se rompió
+        }
+
+        // Racha de invicto
+        if ((partido.resultado === 'victoria' || partido.resultado === 'empate') && rachaInvictoActiva) {
+            rachaInvicto++;
+        } else {
+            rachaInvictoActiva = false; // La racha se rompió
+        }
+    }
+
+    // Calculamos los partidos desde la última victoria
+    const indiceUltimaVictoria = historial.findIndex(p => p.resultado === 'victoria');
+    let partidosSinGanar = 0;
+    if (indiceUltimaVictoria === -1) {
+        // Nunca se ha ganado
+        partidosSinGanar = historial.length;
+    } else {
+        // El índice nos dice cuántos partidos sin ganar hubo antes de la victoria
+        partidosSinGanar = indiceUltimaVictoria;
+    }
+
+    // Actualizamos los valores en la página
+    document.getElementById('racha-victorias').textContent = rachaVictorias;
+    document.getElementById('racha-invicto').textContent = rachaInvicto;
+    document.getElementById('partidos-sin-ganar').textContent = partidosSinGanar;
 }
