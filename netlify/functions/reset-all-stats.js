@@ -14,7 +14,7 @@ exports.handler = async function(event, context) {
     const { error: deleteError } = await supabase
       .from('historial_partidos')
       .delete()
-      .neq('id', -1);
+      .neq('id', -1); // Condición para borrar todo, ahora sí funcionará
 
     if (deleteError) throw deleteError;
 
@@ -27,7 +27,7 @@ exports.handler = async function(event, context) {
         amarillas_totales: 0,
         rojas_totales: 0
       })
-      .neq('id', -1);
+      .neq('id', -1); // Esto usa el 'id' de la tabla jugadores, que ya existía y está bien
 
     if (updateError) throw updateError;
 
@@ -42,4 +42,3 @@ exports.handler = async function(event, context) {
     };
   }
 };
-
